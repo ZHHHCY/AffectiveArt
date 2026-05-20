@@ -1,0 +1,30 @@
+project_root: null
+
+data:
+  annotation_path: "../Images/annotation_5k.json"
+  image_root: ".."
+  resolution: 224
+  center_crop: true
+  val_frac: 0.1
+  test_frac: 0.1
+  split_seed: 42
+  num_workers: 4
+
+model:
+  clip_model: "openai/clip-vit-base-patch32"
+  num_style_classes: 56
+  num_emotion_classes: 12
+  mlp_hidden_dim: 512
+  dropout: 0.3
+  freeze_clip: true
+
+training:
+  output_dir: "outputs/classifiers"
+  task: "both"  # style | emotion | both
+  num_epochs: 30
+  batch_size: 32
+  learning_rate: 1.0e-3
+  weight_decay: 0.01
+  use_class_weights: true  # handle emotion imbalance
+  seed: 42
+  save_every_epochs: 5

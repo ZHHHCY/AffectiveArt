@@ -1,0 +1,41 @@
+project_root: null
+
+data:
+  annotation_path: "../Images/annotation_5k.json"
+  image_root: ".."
+  resolution: 512
+  split_seed: 42
+  val_frac: 0.1
+  test_frac: 0.1
+
+model:
+  base: "runwayml/stable-diffusion-v1-5"
+  use_sdxl: false
+  checkpoint_path: "outputs/lora/checkpoint-final"
+  classifier_dir: "outputs/classifiers"
+  clip_model: "openai/clip-vit-base-patch32"
+
+generation:
+  num_samples: 500
+  num_inference_steps: 30
+  guidance_scale: 7.5
+  seed: 42
+  output_dir: "outputs/eval/generated"
+
+fid:
+  real_images_dir: null  # defaults to extracted val/test images
+  batch_size: 50
+  device: "cuda"
+
+lpips:
+  net: "alex"
+  diversity_n: 4
+  max_reconstruction_samples: 200
+
+aas:
+  alpha: 0.4
+  beta: 0.3
+  gamma: 0.3
+
+output:
+  results_path: "outputs/eval/results.json"

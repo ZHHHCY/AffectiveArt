@@ -1,0 +1,85 @@
+# LoRA fine-tuning with style-emotion disentanglement
+project_root: null  # defaults to parent of emotion_art_generation/
+
+model:
+  base: "runwayml/stable-diffusion-v1-5"
+  # Set to true to use SDXL (requires more VRAM)
+  use_sdxl: false
+  sdxl_base: "stabilityai/stable-diffusion-xl-base-1.0"
+  lora_rank: 4
+  lora_alpha: 32
+  lora_target_modules: ["to_q", "to_v"]
+  use_style_emotion_tokens: true
+  conditioning_mode: "additive"  # additive | concat
+  style_scale: 1.0
+  emotion_scale: 1.0
+
+data:
+  annotation_path: "../Images/annotation_5k.json"
+  image_root: ".."
+  resolution: 512
+  center_crop: true
+  val_frac: 0.1
+  test_frac: 0.1
+  split_seed: 42
+  num_workers: 4
+
+training:
+  output_dir: "outputs/lora"
+  num_epochs: 50
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 1.0e-4
+  lr_scheduler: "cosine"
+  warmup_steps: 500
+  mixed_precision: "fp16"
+  seed: 42
+  save_steps: 1000
+  logging_steps: 50
+  max_grad_norm: 1.0
+  resume_from_checkpoint: null
+
+loss:
+  lambda_style: 0.1
+  lambda_emotion: 0.1
+  lambda_orth: 0.05
+  lambda_attr: 0.05
+  # Fast proxy: CLIP text-image similarity instead of full classifier on decoded images
+  use_clip_alignment: true
+  # Enable auxiliary losses (set false for baseline LoRA-only ablation)
+  enable_style_loss: true
+  enable_emotion_loss: true
+  enable_orth_loss: true
+  enable_attr_loss: true
+  # How often to compute expensive aux losses (every N steps)
+  aux_loss_every: 4
+  classifier_checkpoint_dir: "outputs/classifiers"
+
+# Ablation presets (override loss flags via CLI or copy section)
+ablation:
+  baseline_lora_only:
+    enable_style_loss: false
+    enable_emotion_loss: false
+    enable_orth_loss: false
+    enable_attr_loss: false
+    use_style_emotion_tokens: false
+  style_adapter:
+    enable_style_loss: true
+    enable_emotion_loss: false
+    enable_orth_loss: false
+    enable_attr_loss: false
+  emotion_adapter:
+    enable_style_loss: false
+    enable_emotion_loss: true
+    enable_orth_loss: false
+    enable_attr_loss: false
+  with_orth:
+    enable_orth_loss: true
+  with_attr:
+    enable_attr_loss: true
+  full_model:
+    enable_style_loss: true
+    enable_emotion_loss: true
+    enable_orth_loss: true
+    enable_attr_loss: true
+    use_style_emotion_tokens: true

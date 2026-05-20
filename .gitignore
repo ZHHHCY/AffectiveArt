@@ -1,0 +1,8 @@
+# 不上传的数据与密钥
+Images/
+Images.tar.gz
+*.zip
+keys/
+
+# GitHub LFS 免费额度不足以上传 ~8GB 的 classifier checkpoints
+emotion_art_generation/outputs/classifiers/*.pt
