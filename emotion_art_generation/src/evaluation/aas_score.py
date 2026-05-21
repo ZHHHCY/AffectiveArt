@@ -8,6 +8,7 @@ from PIL import Image
 from transformers import CLIPModel, CLIPProcessor
 
 from src.models.classifiers import EmotionClassifier, StyleClassifier
+from src.models.losses import _clip_feature_tensor
 
 
 @torch.no_grad()
@@ -23,8 +24,8 @@ def _clip_content_score(
     text_inputs = clip_processor(text=content_texts, return_tensors="pt", padding=True, truncation=True)
     image_inputs = {k: v.to(device) for k, v in image_inputs.items()}
     text_inputs = {k: v.to(device) for k, v in text_inputs.items()}
-    img_feat = clip_model.get_image_features(**image_inputs)
-    txt_feat = clip_model.get_text_features(**text_inputs)
+    img_feat = _clip_feature_tensor(clip_model.get_image_features(**image_inputs))
+    txt_feat = _clip_feature_tensor(clip_model.get_text_features(**text_inputs))
     img_feat = F.normalize(img_feat, dim=-1)
     txt_feat = F.normalize(txt_feat, dim=-1)
     sims = (img_feat * txt_feat).sum(dim=-1)

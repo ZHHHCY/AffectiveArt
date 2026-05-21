@@ -7,6 +7,13 @@ import torch.nn.functional as F
 from transformers import CLIPModel, CLIPProcessor
 
 
+def _clip_feature_tensor(features: torch.Tensor) -> torch.Tensor:
+    """Extract embedding tensor from CLIP feature output (transformers 4.x/5.x)."""
+    if hasattr(features, "pooler_output"):
+        return features.pooler_output
+    return features
+
+
 def orthogonality_loss(
     e_style: torch.Tensor,
     e_emotion: torch.Tensor,
@@ -60,8 +67,8 @@ def clip_alignment_loss(
 
     with torch.no_grad():
         clip_model.eval()
-    image_features = clip_model.get_image_features(**image_inputs)
-    text_features = clip_model.get_text_features(**text_inputs)
+    image_features = _clip_feature_tensor(clip_model.get_image_features(**image_inputs))
+    text_features = _clip_feature_tensor(clip_model.get_text_features(**text_inputs))
     image_features = F.normalize(image_features, dim=-1)
     text_features = F.normalize(text_features, dim=-1)
     sim = (image_features * text_features).sum(dim=-1)

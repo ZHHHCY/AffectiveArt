@@ -4,5 +4,10 @@ Images.tar.gz
 *.zip
 keys/
 
-# GitHub LFS 免费额度不足以上传 ~8GB 的 classifier checkpoints
-emotion_art_generation/outputs/classifiers/*.pt
+# 训练/推理产物（保留 outputs 目录结构）
+emotion_art_generation/outputs/**
+!emotion_art_generation/outputs/.gitkeep
+
+# Python 缓存
+__pycache__/
+*.py[cod]
